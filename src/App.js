@@ -1,25 +1,104 @@
-import logo from './logo.svg';
+import React from 'react';      //include react for making class
+import { BrowserRouter as Router, Route } from "react-router-dom";
 import './App.css';
+import Header from './compnents/layout/Header';
+import AddTodo from './compnents/AddTodo';
+import Todos from './compnents/Todos';
+import {v4 as uuid} from 'uuid';      //for generating random ids, installed using 'npm i uuid'
+import About from './compnents/pages/About';
+import Axios from 'axios';    //fetches data from an api
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends React.Component {
+  state = {
+    todos: []
+    // todos: [
+    //   {
+    //     id: uuid(),
+    //     title: 'watch videos',
+    //     completed: false
+    //   },
+    //   {
+    //     id: uuid(),
+    //     title: 'update docs',
+    //     completed: false
+    //   },
+    //   {
+    //     id: uuid(),
+    //     title: 'Try on',
+    //     completed: false
+    //   }
+    // ]
+  }
+
+  //api request for data of todos
+  componentDidMount() {
+    Axios.get('https://jsonplaceholder.typicode.com/todos?_limit=10').then(res => this.setState({todos: res.data})); 
+    //?_limit=10 defines how much rows of data we want
+  }
+
+
+  //toggle completed
+  markComplete = (id) => {
+    console.log(id)
+    //this.state.completed = true;
+    this.setState({todos: this.state.todos.map(todo => {
+      if(todo.id === id)
+        todo.completed = !todo.completed;
+      return todo;
+    })})
+  }
+
+  //deleting a todo
+  deleteTodo = (id) => {
+    console.log(id)
+    Axios.delete(`https://jsonplaceholder.typicode.com/todos/${id}`)
+                .then(res => this.setState({todos: [...this.state.todos.filter(todo => todo.id !== id)]}))
+    //this.setState({todos: [...this.state.todos.filter(todo => todo.id !== id)]});
+  }
+
+  //adding a new todo
+  addTodo = (title) => {
+    console.log(title);
+
+    // Axios.post('https://jsonplaceholder.typicode.com/todos',{
+    //   id: uuid(),
+    //   title: title,
+    //   completed: false
+    // }).then(res => this.setState({todos: [...this.state.todos, res.data]}))
+
+    const newTodo = {
+      id: uuid(),
+      title: title,
+      completed: false
+    }
+    this.setState({todos: [...this.state.todos, newTodo]});
+  }
+ 
+  render(){
+    console.log(this.state.todos);
+    return (
+      //single curly braces when passing a variable
+      <Router>
+        <div className="App">
+          {/* <h1 style={hStyle}>TODO LIST</h1> */}
+          <div className='container'>
+            <Header />
+            <Route exact path='/' render={props =>(
+              <React.Fragment>
+                <AddTodo addTodo={this.addTodo} />
+                <Todos todos= {this.state.todos} markComplete={this.markComplete} deleteTodo={this.deleteTodo} /> 
+              </React.Fragment>
+            )} />
+            <Route path='/about' component={About} />
+          </div>
+        </div>
+      </Router>
+    );
+  }
 }
+
+// const hStyle = {
+//   color: 'purple'
+// }
 
 export default App;
