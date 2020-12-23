@@ -1,11 +1,11 @@
 import React from 'react';      //include react for making class
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import './App.css';
-import Header from './compnents/layout/Header';
-import AddTodo from './compnents/AddTodo';
-import Todos from './compnents/Todos';
+import Header from './components/layout/Header';
+import AddTodo from './components/AddTodo';
+import Todos from './components/Todos';
 import {v4 as uuid} from 'uuid';      //for generating random ids, installed using 'npm i uuid'
-import About from './compnents/pages/About';
+import About from './components/pages/About';
 import Axios from 'axios';    //fetches data from an api
 
 class App extends React.Component {
